@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Installation des Dépendances - macOS (Apple Silicon)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #272822;
+      color: #f8f8f2;
+      padding: 12px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, monospace;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .note {
+      background: #eef9ff;
+      border-left: 5px solid #3498db;
+      padding: 10px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📦 Installation des Dépendances (macOS Apple Silicon)</h1>
+
+  <div class="section">
+    <h2>✅ Prérequis</h2>
+    <ul>
+      <li>Un Mac (Apple Silicon - MX)</li>
+      <li>Connexion Internet</li>
+      <li>Python 3 (installé par défaut sur macOS)</li>
+      <li>Accès administrateur (sudo)</li>
+      <li><a href="https://kdrive.infomaniak.com/app/share/1291466/df94950b-ab2b-48e7-8df9-1f76d7b8c601">Lien vers l'application</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧪 Étapes d'installation</h2>
+    <p>Ouvrez l'application <strong>Terminal</strong> et exécutez les commandes suivantes (elle se situe dans le dossier /Applications/Utilities/Terminal.app) :</p>
+
+    <h3>1. Ouvrir une session administrateur et indiquer le mot de passe administrateur</h3>
+    <pre><code>sudo -s</code></pre>
+
+    <h3>2. Installer Homebrew</h3>
+    <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+
+    <h3>3. Installer ffmpeg</h3>
+    <pre><code>brew install ffmpeg</code></pre>
+
+    <h3>4. Installer Ollama</h3>
+    <pre><code>curl -fsSL https://ollama.ai/install.sh | sh</code></pre>
+
+    <h3>5. Installer openai-whisper</h3>
+    <pre><code>pip3 install openai-whisper</code></pre>
+
+    <h3>6. Lancer Ollama en arrière-plan et télécharger le modèle</h3>
+    <pre><code>ollama serve &gt; /dev/null 2&gt;&amp;1 &amp; sleep 5 &amp;&amp; ollama pull llama3:1</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>✅ Vérification (optionnelle)</h2>
+    <p>Vous pouvez vérifier les installations avec ces commandes :</p>
+    <pre><code>which ffmpeg
+which ollama
+pip3 show openai-whisper</code></pre>
+  </div>
+
+  <div class="note">
+    <strong>ℹ️ Remarques :</strong>
+    <ul>
+      <li><code>ollama serve</code> lance le serveur local de LLM.</li>
+      <li><code>llama3:1</code> est le modèle utilisé.</li>
+      <li><code>openai-whisper</code> permet la transcription audio vers texte.</li>
+    </ul>
+  </div>
+
+</body>
+</html>
