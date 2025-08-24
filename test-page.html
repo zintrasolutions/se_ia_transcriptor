@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEIA Translator - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 SEIA Translator</h1>
+        
+        <div class="status">
+            <h2>✅ Fenêtre Electron affichée !</h2>
+            <p>L'application fonctionne correctement.</p>
+            <p>Timestamp: <span id="timestamp"></span></p>
+        </div>
+        
+        <div class="status">
+            <h3>🔧 Test de l'interface</h3>
+            <button onclick="testServer()">Tester le serveur</button>
+            <button onclick="loadMainInterface()">Charger l'interface principale</button>
+        </div>
+        
+        <div id="result" class="status" style="display: none;">
+            <h3>📊 Résultat du test</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        function testServer() {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultDiv.style.display = 'block';
+            resultContent.innerHTML = '🔄 Test en cours...';
+            
+            fetch('http://localhost:3001')
+                .then(response => {
+                    if (response.ok) {
+                        resultContent.innerHTML = '✅ Serveur accessible sur http://localhost:3001';
+                    } else {
+                        resultContent.innerHTML = '❌ Serveur répond mais avec une erreur: ' + response.status;
+                    }
+                })
+                .catch(error => {
+                    resultContent.innerHTML = '❌ Serveur non accessible: ' + error.message;
+                });
+        }
+        
+        function loadMainInterface() {
+            window.location.href = 'http://localhost:3001';
+        }
+        
+        console.log('Test page loaded successfully');
+    </script>
+</body>
+</html>

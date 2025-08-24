@@ -1,0 +1,37 @@
+🎯 TEST DE L'APP PACKAGÉE SEIA TRANSLATOR
+==========================================
+
+📋 PRÉREQUIS
+------------
+1. Avoir installé toutes les dépendances avec la commande dans COMMANDE-SIMPLE.txt
+2. Avoir démarré le serveur Node.js avec: npm run start-electron
+
+🚀 TEST DE L'APP PACKAGÉE
+-------------------------
+1. Créer l'app packagée:
+   npm run package
+
+2. L'app sera créée dans: dist/mac/SEIA Translator.app
+
+3. Pour tester l'app packagée:
+   - Double-cliquer sur "SEIA Translator.app" dans le dossier dist/mac/
+   - OU utiliser la commande: open "dist/mac/SEIA Translator.app"
+
+⚠️ IMPORTANT
+------------
+- L'app packagée nécessite que le serveur Node.js soit déjà en cours d'exécution
+- Si le serveur n'est pas démarré, l'app affichera une page blanche ou une erreur de connexion
+- Pour démarrer le serveur: npm run start-electron
+
+🔧 DÉPANNAGE
+------------
+Si l'app ne fonctionne pas:
+1. Vérifier que le serveur Node.js est démarré (port 3001)
+2. Vérifier que toutes les dépendances sont installées
+3. Vérifier les logs dans la console
+
+📝 NOTES
+--------
+- L'app Electron utilise le serveur Node.js existant sur localhost:3001
+- Pas de serveur Express intégré dans l'app Electron
+- L'app fait uniquement le nettoyage des dossiers et affiche l'interface

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy IA Local Transcriptor - Video Transcription and Translation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-video"></i> Privacy IA Local Transcriptor</h1>
+                <p>Video transcription and translation with subtitles - All data is processed locally </p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="upload">
+                <i class="fas fa-upload"></i> Upload Video
+            </button>
+            <button class="nav-tab" data-tab="transcribe">
+                <i class="fas fa-microphone"></i> Transcription
+            </button>
+            <button class="nav-tab" data-tab="translate">
+                <i class="fas fa-language"></i> Translation
+            </button>
+
+            <button class="nav-tab" data-tab="export">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section id="upload" class="tab-content active">
+                <div class="card">
+                    <h2><i class="fas fa-cloud-upload-alt"></i> Upload Video</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-video upload-icon"></i>
+                            <h3>Drag your video here</h3>
+                            <p>or click to select a file</p>
+                            <p class="file-types">Supported formats: MP4, AVI, MOV, MKV, WEBM, M4V</p>
+                            <p class="file-size">Maximum size: 2GB</p>
+                        </div>
+                        <input type="file" id="videoFile" accept="video/*" style="display: none;">
+                    </div>
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressText">Uploading...</p>
+                    </div>
+                    <div class="upload-result" id="uploadResult" style="display: none;">
+                        <div class="success-message">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Video uploaded successfully!</h3>
+                            <p id="uploadedFileName"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transcription Section -->
+            <section id="transcribe" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-microphone"></i> Transcription</h2>
+                    <div class="transcription-controls">
+                        <div class="form-group">
+                            <label for="sourceLanguage">Langue source:</label>
+                            <select id="sourceLanguage" class="form-control">
+                                <option value="fr">Français</option>
+                                <option value="en">Anglais</option>
+                                <option value="es">Espagnol</option>
+                                <option value="de">Allemand</option>
+                                <option value="it">Italien</option>
+                                <option value="pt">Portugais</option>
+                                <option value="ja">Japonais</option>
+                                <option value="ko">Coréen</option>
+                                <option value="zh">Chinois</option>
+                                <option value="ru">Russe</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="startTranscription">
+                            <i class="fas fa-play"></i> Start Transcription
+                        </button>
+                    </div>
+                    <div class="transcription-progress" id="transcriptionProgress" style="display: none;">
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="transcriptionProgressBar"></div>
+                            </div>
+                            <p class="progress-text" id="transcriptionProgressText">Transcribing...</p>
+                        </div>
+                    </div>
+                    <div class="transcription-result" id="transcriptionResult" style="display: none;">
+                        <div class="success-message">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Transcription completed!</h3>
+                            <div class="transcription-stats">
+                                <span id="segmentCount"></span> segments detected
+                            </div>
+                        </div>
+                        <div id="transcriptionSegments" class="segments-container"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Translation Section -->
+            <section id="translate" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-language"></i> Translation</h2>
+                    <div class="translation-controls">
+                        <div class="form-group">
+                            <label for="targetLanguage">Target language:</label>
+                            <select id="targetLanguage" class="form-control">
+                                <option value="en">Anglais</option>
+                                <option value="fr">Français</option>
+                                <option value="es">Espagnol</option>
+                                <option value="de">Allemand</option>
+                                <option value="it">Italien</option>
+                                <option value="pt">Portugais</option>
+                                <option value="ja">Japonais</option>
+                                <option value="ko">Coréen</option>
+                                <option value="zh">Chinois</option>
+                                <option value="ru">Russe</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary" id="startTranslation">
+                            <i class="fas fa-language"></i> Start Translation
+                        </button>
+                    </div>
+                    <div class="translation-progress" id="translationProgress" style="display: none;">
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="translationProgressBar"></div>
+                            </div>
+                            <p class="progress-text" id="translationProgressText">Translating...</p>
+                        </div>
+                    </div>
+                    <div class="translation-result" id="translationResult" style="display: none;">
+                        <div class="success-message">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Translation completed!</h3>
+                        </div>
+                        <div class="translation-layout">
+                            <div class="video-preview">
+                                <video id="previewVideo" controls>
+                                    <source src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-info">
+                                    <p>Click on a segment to jump to that position in the video</p>
+                                </div>
+                            </div>
+                            <div class="segments-panel">
+                                <div id="translatedSegments" class="segments-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- Export Section -->
+            <section id="export" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-download"></i> Export & Download</h2>
+                    <div class="export-options">
+                        <div class="export-option">
+                            <h3><i class="fas fa-file-text"></i> SRT File</h3>
+                            <p>Download the subtitle file in SRT format to working with another editing software like Davinci Resolve</p>
+                            <button class="btn btn-secondary" id="downloadSRT">
+                                <i class="fas fa-download"></i> Download SRT
+                            </button>
+                        </div>
+                        <div class="export-option">
+                            <h3><i class="fas fa-video"></i> Video with Subtitles</h3>
+                            <p>Create a video with embedded subtitles</p>
+                            <div class="form-group">
+                                <label for="outputFilename">Output filename:</label>
+                                <input type="text" id="outputFilename" class="form-control" placeholder="video_with_subtitles.mp4">
+                            </div>
+                            <button class="btn btn-primary" id="applySubtitles">
+                                <i class="fas fa-film"></i> Create Video
+                            </button>
+                        </div>
+                    </div>
+                    <div class="export-progress" id="exportProgress" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Creating video...</p>
+                    </div>
+                    <div class="export-result" id="exportResult" style="display: none;">
+                        <div class="success-message">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Video created successfully!</h3>
+                            <p id="exportedFileName"></p>
+                            <div class="download-buttons">
+                                <button class="btn btn-primary" id="downloadVideo">
+                                    <i class="fas fa-download"></i> Download Video
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- File Browser Modal -->
+        <div class="modal" id="fileModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-folder-open"></i> Fichiers SRT disponibles</h3>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="file-list" id="fileList">
+                        <!-- Files will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{
+  "name": "seia-translateor",
+  "version": "1.0.0",
+  "description": "Application web pour transcription et traduction de vidéos avec sous-titres",
+  "main": "electron-main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "electron": "electron .",
+    "electron-dev": "NODE_ENV=development electron .",
+    "build": "echo 'No build step required for this app'",
+    "setup": "cp env.example .env && npm install",
+    "check": "node -e \"console.log('Node.js version:', process.version)\" && ffmpeg -version && echo 'FFmpeg OK'",
+    "check-deps": "node check-deps.js",
+    "test-external": "node test-external-tools.js",
+    "install-macos": "chmod +x install-macos.sh && ./install-macos.sh",
+    "start-macos": "./start-macos.sh",
+    "start-electron": "./start-electron.sh",
+    "install-macos": "./installer-macos.sh",
+    "install-apple-silicon": "./install-apple-silicon.sh",
+    "package": "electron-builder",
+    "package:mac": "electron-builder --mac",
+    "pack": "electron-builder --dir"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "fs-extra": "^11.1.1",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.20.1",
+    "path": "^0.12.7",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12",
+    "@electron/notarize": "^2.1.0",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "video",
+    "transcription",
+    "translation",
+    "subtitles",
+    "ollama",
+    "llama"
+  ],
+  "author": "Guillaume David",
+  "license": "MIT",
+  "build": {
+    "appId": "com.guillaumedavid.seia-translator",
+    "productName": "SEIA Translator",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "server.js",
+      "public/**/*",
+      "uploads/.gitkeep",
+      "output/.gitkeep",
+      "subtitles/.gitkeep",
+      "node_modules/**/*",
+      "package.json",
+      ".env"
+    ],
+    "asarUnpack": [
+      "server.js",
+      "node_modules/**/*",
+      "public/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "assets/icon.icns"
+    },
+    "dmg": {
+      "title": "SEIA Translator",
+      "background": "assets/dmg-background.png",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 140,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+🚀 COMMANDE D'INSTALLATION SEIA TRANSLATOR - APPLE SILICON
+==========================================================
+
+Copiez et collez cette commande complète dans votre Terminal :
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile && eval "$(/opt/homebrew/bin/brew shellenv)" && /opt/homebrew/bin/brew install ffmpeg && curl -fsSL https://ollama.ai/install.sh | sh && pip3 install openai-whisper && ollama serve > /dev/null 2>&1 & sleep 5 && ollama pull llama3.1
+
+📋 DÉTAIL DE LA COMMANDE :
+==========================
+
+Cette commande fait tout automatiquement :
+
+1. /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   → Installe Homebrew
+
+2. echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+   → Configure Homebrew pour Apple Silicon
+
+3. eval "$(/opt/homebrew/bin/brew shellenv)"
+   → Active Homebrew dans la session actuelle
+
+4. /opt/homebrew/bin/brew install ffmpeg
+   → Installe FFmpeg
+
+5. curl -fsSL https://ollama.ai/install.sh | sh
+   → Installe Ollama
+
+6. pip3 install openai-whisper
+   → Installe Whisper
+
+7. ollama serve > /dev/null 2>&1 &
+   → Démarre Ollama en arrière-plan
+
+8. sleep 5
+   → Attend 5 secondes
+
+9. ollama pull llama3.1
+   → Télécharge le modèle llama3.1
+
+✅ APRÈS L'INSTALLATION :
+========================
+
+Une fois la commande terminée, vous pouvez :
+
+1. Lancer SEIA Translator depuis le dossier Applications
+2. L'app détectera que toutes les dépendances sont installées
+3. Tout fonctionnera immédiatement !
+
+⚠️ NOTES IMPORTANTES :
+=====================
+
+• Cette commande est conçue pour Apple Silicon (M1/M2/M3) uniquement
+• Assurez-vous d'avoir une connexion internet stable
+• L'installation peut prendre 10-15 minutes selon votre connexion
+• Le modèle llama3.1 fait environ 4GB, prévoyez suffisamment d'espace
+
+🔧 EN CAS DE PROBLÈME :
+======================
+
+Si la commande échoue, essayez de l'exécuter en plusieurs parties :
+
+1. Installation de Homebrew :
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+2. Configuration Homebrew :
+   echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+   eval "$(/opt/homebrew/bin/brew shellenv)"
+
+3. Installation des outils :
+   /opt/homebrew/bin/brew install ffmpeg
+   curl -fsSL https://ollama.ai/install.sh | sh
+   pip3 install openai-whisper
+
+4. Installation du modèle :
+   ollama serve > /dev/null 2>&1 &
+   sleep 5
+   ollama pull llama3.1
+
+🎉 BONNE INSTALLATION !
