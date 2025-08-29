@@ -20,16 +20,18 @@
 
         <!-- Navigation -->
         <nav class="nav-tabs">
-            <button class="nav-tab active" data-tab="upload">
-                <i class="fas fa-upload"></i> Upload Video
-            </button>
-            <button class="nav-tab" data-tab="transcribe">
-                <i class="fas fa-microphone"></i> Transcription
-            </button>
+                            <button class="nav-tab active" data-tab="projects">
+                    <i class="fas fa-folder"></i> Projects
+                </button>
+                <button class="nav-tab" data-tab="upload">
+                    <i class="fas fa-upload"></i> New Project
+                </button>
+                <button class="nav-tab" data-tab="transcribe">
+                    <i class="fas fa-microphone"></i> Transcription
+                </button>
             <button class="nav-tab" data-tab="translate">
                 <i class="fas fa-language"></i> Translation
             </button>
-
             <button class="nav-tab" data-tab="export">
                 <i class="fas fa-download"></i> Export
             </button>
@@ -37,8 +39,42 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Projects Section -->
+            <section id="projects" class="tab-content active">
+                <div class="card">
+                    <h2><i class="fas fa-folder"></i> My Projects</h2>
+                    <div class="projects-container">
+                        <div class="projects-header">
+                            <h3>Your video projects</h3>
+                            <div class="projects-controls">
+                                <div class="search-container">
+                                    <input type="text" id="projectSearch" class="form-control" placeholder="Search for a project...">
+                                    <i class="fas fa-search search-icon"></i>
+                                </div>
+                                <button class="btn btn-primary" id="refreshProjects">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="projects-list" id="projectsList">
+                            <!-- Les projets seront chargés ici -->
+                        </div>
+                        <div class="no-projects" id="noProjects" style="display: none;">
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h3>No projects yet</h3>
+                                <p>Create your first project by uploading a video</p>
+                                <button class="btn btn-primary" onclick="switchToTab('upload')">
+                                    <i class="fas fa-plus"></i> Create a project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Upload Section -->
-            <section id="upload" class="tab-content active">
+            <section id="upload" class="tab-content">
                 <div class="card">
                     <h2><i class="fas fa-cloud-upload-alt"></i> Upload Video</h2>
                     <div class="upload-area" id="uploadArea">
@@ -73,18 +109,18 @@
                     <h2><i class="fas fa-microphone"></i> Transcription</h2>
                     <div class="transcription-controls">
                         <div class="form-group">
-                            <label for="sourceLanguage">Langue source:</label>
+                            <label for="sourceLanguage">Source language:</label>
                             <select id="sourceLanguage" class="form-control">
-                                <option value="fr">Français</option>
-                                <option value="en">Anglais</option>
-                                <option value="es">Espagnol</option>
-                                <option value="de">Allemand</option>
-                                <option value="it">Italien</option>
-                                <option value="pt">Portugais</option>
-                                <option value="ja">Japonais</option>
-                                <option value="ko">Coréen</option>
-                                <option value="zh">Chinois</option>
-                                <option value="ru">Russe</option>
+                                <option value="en">English</option>
+                                <option value="fr">French</option>
+                                <option value="es">Spanish</option>
+                                <option value="de">German</option>
+                                <option value="it">Italian</option>
+                                <option value="pt">Portuguese</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="zh">Chinese</option>
+                                <option value="ru">Russian</option>
                             </select>
                         </div>
                         <button class="btn btn-primary" id="startTranscription">
@@ -146,10 +182,7 @@
                         </div>
                     </div>
                     <div class="translation-result" id="translationResult" style="display: none;">
-                        <div class="success-message">
-                            <i class="fas fa-check-circle"></i>
-                            <h3>Translation completed!</h3>
-                        </div>
+                    
                         <div class="translation-layout">
                             <div class="video-preview">
                                 <video id="previewVideo" controls>
@@ -218,7 +251,7 @@
         <div class="modal" id="fileModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3><i class="fas fa-folder-open"></i> Fichiers SRT disponibles</h3>
+                    <h3><i class="fas fa-folder-open"></i> Available SRT Files</h3>
                     <button class="modal-close" id="closeModal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -232,6 +265,24 @@
 
     <!-- Toast Notifications -->
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modal pour renommer un projet -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+                            <div class="modal-header">
+                    <h3>Rename Project</h3>
+                    <span class="close" onclick="closeRenameModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <label for="newProjectName">New name:</label>
+                    <input type="text" id="newProjectName" class="form-control" placeholder="Enter the new project name">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeRenameModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="confirmRenameProject()">Rename</button>
+                </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

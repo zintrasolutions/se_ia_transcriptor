@@ -63,6 +63,7 @@
       "uploads/.gitkeep",
       "output/.gitkeep",
       "subtitles/.gitkeep",
+      "projects/.gitkeep",
       "node_modules/**/*",
       "package.json",
       ".env"

@@ -1,0 +1,12 @@
+# Dockerfile for Ollama with default models
+FROM ollama/ollama:latest
+
+# Install bash for our initialization script
+RUN apt-get update && apt-get install -y bash && rm -rf /var/lib/apt/lists/*
+
+# Copy the initialization script
+COPY ollama-init.sh /app/ollama-init.sh
+RUN chmod +x /app/ollama-init.sh
+
+# Set entrypoint
+ENTRYPOINT ["/app/ollama-init.sh"]

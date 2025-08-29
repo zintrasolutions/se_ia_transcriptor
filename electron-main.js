@@ -32,48 +32,26 @@ if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
 
-// Nettoyer les dossiers au démarrage
-console.log('🧹 Nettoyage des dossiers subtitles, output et uploads...');
+// Vérifier et créer les dossiers nécessaires
+console.log('📁 Vérification des dossiers de travail...');
 try {
-    // Nettoyer le dossier uploads
-    const uploadFiles = fs.readdirSync(uploadsDir);
-    uploadFiles.forEach(file => {
-        const filePath = path.join(uploadsDir, file);
-        const stats = fs.statSync(filePath);
-        const fileAge = Date.now() - stats.mtime.getTime();
-        const oneHour = 60 * 60 * 1000;
-        
-        if (file.endsWith('.mp3') || file.endsWith('.json') || fileAge > oneHour) {
-            fs.rmSync(filePath, { force: true });
-            console.log(`🗑️ Supprimé: ${file}`);
-        }
-    });
+    // Créer les dossiers s'ils n'existent pas
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log('📁 Dossier uploads créé');
+    }
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+        console.log('📁 Dossier output créé');
+    }
+    if (!fs.existsSync(subtitlesDir)) {
+        fs.mkdirSync(subtitlesDir, { recursive: true });
+        console.log('📁 Dossier subtitles créé');
+    }
     
-    // Nettoyer le dossier output
-    const outputFiles = fs.readdirSync(outputDir);
-    outputFiles.forEach(file => {
-        const filePath = path.join(outputDir, file);
-        const stats = fs.statSync(filePath);
-        const fileAge = Date.now() - stats.mtime.getTime();
-        const twoHours = 2 * 60 * 60 * 1000;
-        
-        if (!file.includes('video_with_subtitles') || fileAge > twoHours) {
-            fs.rmSync(filePath, { force: true });
-            console.log(`🗑️ Supprimé: ${file}`);
-        }
-    });
-    
-    // Nettoyer complètement le dossier subtitles
-    const subtitleFiles = fs.readdirSync(subtitlesDir);
-    subtitleFiles.forEach(file => {
-        const filePath = path.join(subtitlesDir, file);
-        fs.rmSync(filePath, { force: true });
-        console.log(`🗑️ Supprimé: ${file}`);
-    });
-    
-    console.log('✅ Nettoyage terminé');
+    console.log('✅ Dossiers de travail prêts');
 } catch (error) {
-    console.log('⚠️ Erreur lors du nettoyage:', error.message);
+    console.log('⚠️ Erreur lors de la vérification des dossiers:', error.message);
 }
 
 // Vérifier si le serveur est déjà en cours d'exécution

@@ -1,79 +1,123 @@
 // Global variables
+let currentProject = null;
 let currentVideoPath = null;
 let currentSegments = [];
 let translatedSegments = [];
 let currentVideoElement = null;
 let currentExportedVideoFilename = null;
+let projects = [];
 
-// Language options
+// Language options - Complete list ordered alphabetically by English name
 const languages = {
-    'en': 'English',
-    'fr': 'French',
-    'es': 'Spanish',
-    'de': 'German',
-    'it': 'Italian',
-    'pt': 'Portuguese',
-    'ja': 'Japanese',
-    'ko': 'Korean',
-    'zh': 'Chinese',
-    'ru': 'Russian',
+    'af': 'Afrikaans',
+    'sq': 'Albanian',
+    'am': 'Amharic',
     'ar': 'Arabic',
-    'hi': 'Hindi',
-    'nl': 'Dutch',
-    'sv': 'Swedish',
-    'no': 'Norwegian',
-    'da': 'Danish',
-    'fi': 'Finnish',
-    'pl': 'Polish',
-    'tr': 'Turkish',
-    'he': 'Hebrew',
-    'th': 'Thai',
-    'vi': 'Vietnamese',
-    'id': 'Indonesian',
-    'ms': 'Malay',
-    'fa': 'Persian',
-    'ur': 'Urdu',
+    'hy': 'Armenian',
+    'az': 'Azerbaijani',
+    'eu': 'Basque',
+    'be': 'Belarusian',
     'bn': 'Bengali',
-    'te': 'Telugu',
-    'ta': 'Tamil',
+    'bs': 'Bosnian',
+    'bg': 'Bulgarian',
+    'ca': 'Catalan',
+    'ceb': 'Cebuano',
+    'zh': 'Chinese (Simplified)',
+    'zh-TW': 'Chinese (Traditional)',
+    'co': 'Corsican',
+    'hr': 'Croatian',
+    'cs': 'Czech',
+    'da': 'Danish',
+    'nl': 'Dutch',
+    'en': 'English',
+    'eo': 'Esperanto',
+    'et': 'Estonian',
+    'fi': 'Finnish',
+    'fr': 'French',
+    'fy': 'Frisian',
+    'gl': 'Galician',
+    'ka': 'Georgian',
+    'de': 'German',
+    'el': 'Greek',
     'gu': 'Gujarati',
+    'ht': 'Haitian Creole',
+    'ha': 'Hausa',
+    'haw': 'Hawaiian',
+    'he': 'Hebrew',
+    'hi': 'Hindi',
+    'hmn': 'Hmong',
+    'hu': 'Hungarian',
+    'is': 'Icelandic',
+    'ig': 'Igbo',
+    'id': 'Indonesian',
+    'ga': 'Irish',
+    'it': 'Italian',
+    'ja': 'Japanese',
+    'jv': 'Javanese',
     'kn': 'Kannada',
+    'kk': 'Kazakh',
+    'km': 'Khmer',
+    'ko': 'Korean',
+    'ku': 'Kurdish',
+    'ky': 'Kyrgyz',
+    'lo': 'Lao',
+    'la': 'Latin',
+    'lv': 'Latvian',
+    'lt': 'Lithuanian',
+    'lb': 'Luxembourgish',
+    'mk': 'Macedonian',
+    'mg': 'Malagasy',
+    'ms': 'Malay',
     'ml': 'Malayalam',
+    'mt': 'Maltese',
+    'mi': 'Maori',
+    'mr': 'Marathi',
+    'mn': 'Mongolian',
+    'my': 'Myanmar (Burmese)',
+    'ne': 'Nepali',
+    'no': 'Norwegian',
+    'ny': 'Nyanja (Chichewa)',
+    'or': 'Odia (Oriya)',
+    'ps': 'Pashto',
+    'fa': 'Persian',
+    'pl': 'Polish',
+    'pt': 'Portuguese',
     'pa': 'Punjabi',
-    'si': 'Sinhala',
-    'my': 'Burmese',
-    'km': 'Khmer',
-    'lo': 'Lao',
-    'ne': 'Nepali',
-    'bo': 'Tibetan',
-    'mn': 'Mongolian',
-    'ka': 'Georgian',
-    'hy': 'Armenian',
-    'az': 'Azerbaijani',
-    'kk': 'Kazakh',
-    'ky': 'Kyrgyz',
-    'uz': 'Uzbek',
-    'tk': 'Turkmen',
-    'tg': 'Tajik',
-    'ps': 'Pashto',
+    'ro': 'Romanian',
+    'ru': 'Russian',
+    'sm': 'Samoan',
+    'gd': 'Scots Gaelic',
+    'sr': 'Serbian',
+    'st': 'Sesotho',
+    'sn': 'Shona',
     'sd': 'Sindhi',
-    'si': 'Sinhala',
-    'my': 'Burmese',
-    'km': 'Khmer',
-    'lo': 'Lao',
-    'ne': 'Nepali',
-    'bo': 'Tibetan',
-    'mn': 'Mongolian',
-    'ka': 'Georgian',
-    'hy': 'Armenian',
-    'az': 'Azerbaijani',
-    'kk': 'Kazakh',
-    'ky': 'Kyrgyz',
-    'uz': 'Uzbek',
-    'tk': 'Turkmen',
+    'si': 'Sinhala (Sinhalese)',
+    'sk': 'Slovak',
+    'sl': 'Slovenian',
+    'so': 'Somali',
+    'es': 'Spanish',
+    'su': 'Sundanese',
+    'sw': 'Swahili',
+    'sv': 'Swedish',
     'tg': 'Tajik',
-    'ps': 'Pashto',
-    'sd': 'Sindhi'
+    'ta': 'Tamil',
+    'tt': 'Tatar',
+    'te': 'Telugu',
+    'th': 'Thai',
+    'tr': 'Turkish',
+    'tk': 'Turkmen',
+    'ak': 'Twi',
+    'uk': 'Ukrainian',
+    'ur': 'Urdu',
+    'ug': 'Uyghur',
+    'uz': 'Uzbek',
+    've': 'Venda',
+    'vi': 'Vietnamese',
+    'cy': 'Welsh',
+    'xh': 'Xhosa',
+    'yi': 'Yiddish',
+    'yo': 'Yoruba',
+    'zu': 'Zulu'
 };
 
 // Initialize the application
@@ -81,7 +125,476 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeLanguageSelects();
     setupEventListeners();
     checkOllamaStatus();
+    loadProjects(); // Charger les projets au démarrage
 });
+
+// Fonctions de gestion des projets
+async function loadProjects() {
+    try {
+        const response = await fetch('/api/projects');
+        if (response.ok) {
+            projects = await response.json();
+            displayProjects();
+        } else {
+            console.error('Erreur lors du chargement des projets');
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des projets:', error);
+    }
+}
+
+function displayProjects() {
+    const projectsList = document.getElementById('projectsList');
+    const noProjects = document.getElementById('noProjects');
+    
+    if (projects.length === 0) {
+        projectsList.style.display = 'none';
+        noProjects.style.display = 'block';
+        return;
+    }
+    
+    projectsList.style.display = 'grid';
+    noProjects.style.display = 'none';
+    
+    projectsList.innerHTML = projects.map(project => createProjectCard(project)).join('');
+}
+
+function createProjectCard(project) {
+    const statusText = getStatusText(project.status);
+    const statusClass = `project-status ${project.status}`;
+    const date = new Date(project.createdAt).toLocaleDateString('fr-FR');
+    
+    return `
+        <div class="project-card" data-project-id="${project.id}">
+            <button class="project-delete" onclick="deleteProject('${project.id}', event)">
+                <i class="fas fa-trash"></i>
+            </button>
+            <div class="project-header">
+                <div>
+                    <div class="project-title">${project.name}</div>
+                    <div class="project-date">Created on ${date}</div>
+                </div>
+                <span class="${statusClass}">${statusText}</span>
+            </div>
+            <div class="project-info">
+                <div class="project-info-item">
+                    <i class="fas fa-video"></i>
+                    <span>${project.originalName}</span>
+                </div>
+                ${project.segments.length > 0 ? `
+                    <div class="project-info-item">
+                        <i class="fas fa-microphone"></i>
+                        <span>${project.segments.length} segments</span>
+                    </div>
+                ` : ''}
+                ${project.translatedSegments.length > 0 ? `
+                    <div class="project-info-item">
+                        <i class="fas fa-language"></i>
+                        <span>Traduit en ${getLanguageName(project.targetLanguage)}</span>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="project-actions">
+                <button class="btn btn-primary" onclick="openProject('${project.id}')">
+                    <i class="fas fa-edit"></i> Open
+                </button>
+                <button class="btn btn-secondary" onclick="renameProject('${project.id}', '${project.name.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-edit"></i> Rename
+                </button>
+                ${project.exportedVideo ? `
+                    <button class="btn btn-secondary" onclick="downloadExportedVideo('${project.id}')">
+                        <i class="fas fa-download"></i> Video
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        'uploaded': 'Uploaded',
+        'transcribing': 'Transcribing...',
+        'transcribed': 'Transcribed',
+        'translating': 'Translating...',
+        'translated': 'Translated',
+        'exported': 'Exported'
+    };
+    return statusMap[status] || status;
+}
+
+function getLanguageName(code) {
+    return languages[code] || code;
+}
+
+async function openProject(projectId) {
+    console.log('🔍 Tentative d\'ouverture du projet:', projectId);
+    try {
+        const response = await fetch(`/api/projects/${projectId}`);
+        console.log('📡 Réponse du serveur:', response.status);
+        
+        if (response.ok) {
+            currentProject = await response.json();
+            console.log('📋 Projet chargé:', currentProject);
+            
+            currentVideoPath = currentProject.videoPath;
+            currentSegments = currentProject.segments || [];
+            translatedSegments = currentProject.translatedSegments || [];
+            
+            console.log('🎥 Chemin vidéo:', currentVideoPath);
+            console.log('📝 Segments:', currentSegments.length);
+            console.log('🌐 Segments traduits:', translatedSegments.length);
+            console.log('📋 Détail des segments traduits:', translatedSegments);
+            
+            // Mettre à jour l'interface selon le statut du projet
+            updateInterfaceForProject();
+            
+            // Afficher les données selon l'état du projet
+            if (currentSegments.length > 0) {
+                // Afficher d'abord la transcription
+                displayTranscription(currentSegments);
+                
+                // Si il y a des traductions, afficher aussi la traduction
+                if (translatedSegments.length > 0) {
+                    // Charger la vidéo dans le lecteur
+                    const video = document.getElementById('previewVideo');
+                    if (video && currentVideoPath) {
+                        video.src = `/api/video/${encodeURIComponent(currentVideoPath)}`;
+                        video.load();
+                    }
+                    
+                    // Afficher les segments traduits
+                    updateTranslationDisplay();
+                    
+                    // Passer à l'onglet traduction
+                    switchTab('translate');
+                } else {
+                    // Passer à l'onglet transcription
+                    switchTab('transcribe');
+                }
+            } else {
+                switchTab('upload');
+            }
+            
+            showNotification('Projet chargé avec succès', 'success');
+        } else {
+            const errorData = await response.json();
+            console.error('❌ Erreur serveur:', errorData);
+            showNotification('Erreur lors du chargement du projet: ' + (errorData.error || 'Erreur inconnue'), 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'ouverture du projet:', error);
+        showNotification('Erreur lors de l\'ouverture du projet: ' + error.message, 'error');
+    }
+}
+
+function updateInterfaceForProject() {
+    // Mettre à jour les langues selon le projet
+    if (currentProject.sourceLanguage) {
+        document.getElementById('sourceLanguage').value = currentProject.sourceLanguage;
+    }
+    if (currentProject.targetLanguage) {
+        document.getElementById('targetLanguage').value = currentProject.targetLanguage;
+    }
+    
+    // Mettre à jour le nom de fichier de sortie
+    if (currentProject.name) {
+        document.getElementById('outputFilename').value = `${currentProject.name}_avec_sous_titres.mp4`;
+    }
+}
+
+async function deleteProject(projectId, event) {
+    event.stopPropagation();
+    
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/projects/${projectId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            // Retirer le projet de la liste locale
+            projects = projects.filter(p => p.id !== projectId);
+            displayProjects();
+            
+            // Si c'était le projet actuel, le vider
+            if (currentProject && currentProject.id === projectId) {
+                currentProject = null;
+                currentVideoPath = null;
+                currentSegments = [];
+                translatedSegments = [];
+            }
+            
+            showNotification('Projet supprimé avec succès', 'success');
+        } else {
+            showNotification('Erreur lors de la suppression du projet', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la suppression du projet:', error);
+        showNotification('Erreur lors de la suppression du projet', 'error');
+    }
+}
+
+async function downloadExportedVideo(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    if (project && project.exportedVideo) {
+        const link = document.createElement('a');
+        link.href = `/api/video/${encodeURIComponent(project.exportedVideo)}`;
+        link.download = path.basename(project.exportedVideo);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function switchToTab(tabName) {
+    // Retirer la classe active de tous les onglets
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Ajouter la classe active à l'onglet sélectionné
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+}
+
+// Fonction pour filtrer les projets par recherche
+function filterProjects() {
+    const searchTerm = document.getElementById('projectSearch').value.toLowerCase().trim();
+    const projectCards = document.querySelectorAll('.project-card');
+    let visibleCount = 0;
+    
+    projectCards.forEach(card => {
+        const projectName = card.querySelector('.project-title').textContent.toLowerCase();
+        const originalName = card.querySelector('.project-info-item span').textContent.toLowerCase();
+        
+        // Recherche dans le nom du projet et le nom original du fichier
+        if (projectName.includes(searchTerm) || originalName.includes(searchTerm)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Afficher un message si aucun projet ne correspond
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    
+    if (visibleCount === 0 && searchTerm !== '') {
+        if (!noResultsMessage) {
+            const message = document.createElement('div');
+            message.id = 'noResultsMessage';
+            message.className = 'no-results';
+            message.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No projects found</h3>
+                    <p>No projects match "${searchTerm}"</p>
+                    <button class="btn btn-secondary" onclick="clearSearch()">
+                        <i class="fas fa-times"></i> Clear search
+                    </button>
+                </div>
+            `;
+            document.getElementById('projectsList').appendChild(message);
+        }
+    } else if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
+    
+    // Afficher le nombre de résultats trouvés
+    updateSearchResults(visibleCount, searchTerm);
+}
+
+// Fonction pour effacer la recherche
+function clearSearch() {
+    document.getElementById('projectSearch').value = '';
+    filterProjects();
+}
+
+// Fonction pour afficher le nombre de résultats
+function updateSearchResults(count, searchTerm) {
+    const resultsInfo = document.getElementById('searchResultsInfo');
+    
+    if (searchTerm !== '') {
+        if (!resultsInfo) {
+            const info = document.createElement('div');
+            info.id = 'searchResultsInfo';
+            info.className = 'search-results-info';
+            info.innerHTML = `${count} project${count > 1 ? 's' : ''} found`;
+            document.querySelector('.projects-controls').appendChild(info);
+        } else {
+            resultsInfo.innerHTML = `${count} project${count > 1 ? 's' : ''} found`;
+        }
+    } else if (resultsInfo) {
+        resultsInfo.remove();
+    }
+}
+
+// Variables globales pour le renommage
+let currentRenameProjectId = null;
+let currentRenameProjectName = null;
+
+// Fonction pour ouvrir le modal de renommage
+function renameProject(projectId, currentName) {
+    currentRenameProjectId = projectId;
+    currentRenameProjectName = currentName;
+    
+    // Remplir le champ avec le nom actuel
+    document.getElementById('newProjectName').value = currentName;
+    
+    // Afficher le modal
+    document.getElementById('renameModal').style.display = 'block';
+    
+    // Focus sur le champ de saisie
+    setTimeout(() => {
+        document.getElementById('newProjectName').focus();
+        document.getElementById('newProjectName').select();
+    }, 100);
+}
+
+// Fonction pour fermer le modal de renommage
+function closeRenameModal() {
+    document.getElementById('renameModal').style.display = 'none';
+    currentRenameProjectId = null;
+    currentRenameProjectName = null;
+}
+
+// Fonction pour confirmer le renommage
+async function confirmRenameProject() {
+    const newName = document.getElementById('newProjectName').value.trim();
+    
+    if (!newName || newName === currentRenameProjectName) {
+        closeRenameModal();
+        return;
+    }
+    
+    try {
+        console.log('🔄 Renommage du projet:', currentRenameProjectId, 'vers:', newName);
+        
+        const response = await fetch(`/api/projects/${currentRenameProjectId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: newName,
+                updatedAt: new Date().toISOString()
+            })
+        });
+        
+        if (response.ok) {
+            const updatedProject = await response.json();
+            
+            // Mettre à jour le projet actuel s'il s'agit du même projet
+            if (currentProject && currentProject.id === currentRenameProjectId) {
+                currentProject = updatedProject;
+            }
+            
+            // Recharger la liste des projets
+            await loadProjects();
+            
+            // Fermer le modal
+            closeRenameModal();
+            
+            // Afficher un message de succès
+            showNotification('Project renamed successfully!', 'success');
+        } else {
+            const error = await response.json();
+            showNotification('Error during rename: ' + (error.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors du renommage:', error);
+        showNotification('Error during rename: ' + error.message, 'error');
+    }
+}
+
+// Variable pour le debounce de sauvegarde
+let saveTimeout = null;
+
+// Fonction pour sauvegarder les modifications du projet avec debounce
+async function saveProjectChanges() {
+    if (!currentProject) {
+        console.log('⚠️ Aucun projet actuel pour sauvegarder');
+        return;
+    }
+    
+    // Annuler la sauvegarde précédente si elle existe
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+    }
+    
+    // Programmer une nouvelle sauvegarde dans 2 secondes
+    saveTimeout = setTimeout(async () => {
+        try {
+            console.log('💾 Sauvegarde des modifications du projet...');
+            
+            // Préparer les données à sauvegarder
+            const updates = {
+                translatedSegments: translatedSegments,
+                updatedAt: new Date().toISOString()
+            };
+            
+            // Envoyer les modifications au serveur
+            const response = await fetch(`/api/projects/${currentProject.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updates)
+            });
+            
+            if (response.ok) {
+                const updatedProject = await response.json();
+                currentProject = updatedProject;
+                console.log('✅ Modifications sauvegardées avec succès');
+                
+                // Mettre à jour la liste des projets
+                await loadProjects();
+            } else {
+                console.error('❌ Erreur lors de la sauvegarde:', response.status);
+            }
+        } catch (error) {
+            console.error('❌ Erreur lors de la sauvegarde des modifications:', error);
+        }
+    }, 2000); // Attendre 2 secondes après la dernière modification
+}
+
+// Fonction pour afficher un indicateur de sauvegarde
+function showSaveIndicator() {
+    // Supprimer l'indicateur existant s'il y en a un
+    const existingIndicator = document.getElementById('saveIndicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+    
+    // Créer un nouvel indicateur
+    const indicator = document.createElement('div');
+    indicator.id = 'saveIndicator';
+    indicator.innerHTML = '<i class="fas fa-save"></i> Sauvegarde...';
+    indicator.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #17a2b8;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-size: 14px;
+        z-index: 1001;
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(indicator);
+    
+    // Supprimer l'indicateur après 3 secondes
+    setTimeout(() => {
+        if (indicator.parentNode) {
+            indicator.remove();
+        }
+    }, 3000);
+}
 
 function initializeLanguageSelects() {
     const sourceLanguage = document.getElementById('sourceLanguage');
@@ -132,11 +645,38 @@ function setupEventListeners() {
     document.getElementById('applySubtitles').addEventListener('click', applySubtitles);
     document.getElementById('downloadSRT').addEventListener('click', downloadSRT);
     
+    // Projects
+    document.getElementById('refreshProjects').addEventListener('click', loadProjects);
+    
+    // Search functionality
+    document.getElementById('projectSearch').addEventListener('input', filterProjects);
+    
     // Téléchargement vidéo
     document.addEventListener('click', function(e) {
         if (e.target && e.target.id === 'downloadVideo') {
             e.preventDefault();
             downloadVideoMethod1();
+        }
+    });
+    
+    // Gestionnaires pour le modal de renommage
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeRenameModal();
+        }
+    });
+    
+    // Fermer le modal en cliquant en dehors
+    document.getElementById('renameModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeRenameModal();
+        }
+    });
+    
+    // Gestionnaire pour la touche Entrée dans le champ de renommage
+    document.getElementById('newProjectName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            confirmRenameProject();
         }
     });
 }
@@ -205,15 +745,20 @@ function uploadFile(file) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            currentVideoPath = data.path;
+            currentProject = data.project;
+            currentVideoPath = data.project.videoPath;
             progressBar.style.width = '100%';
-            progressText.textContent = 'Upload completed!';
+            progressText.textContent = 'Projet créé avec succès!';
             
             setTimeout(() => {
                 uploadProgress.style.display = 'none';
                 uploadResult.style.display = 'block';
-                document.getElementById('uploadedFileName').textContent = data.filename;
+                document.getElementById('uploadedFileName').textContent = data.project.originalName;
+                
+                // Recharger la liste des projets
+                loadProjects().then(() => {
                 switchTab('transcribe');
+                });
             }, 1000);
         } else {
             throw new Error(data.error);
@@ -226,8 +771,8 @@ function uploadFile(file) {
 }
 
 function startTranscription() {
-    if (!currentVideoPath) {
-        alert('Please upload a video first.');
+    if (!currentProject) {
+        alert('Please first create a project by uploading a video.');
         return;
     }
 
@@ -255,7 +800,7 @@ function startTranscription() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            videoPath: currentVideoPath,
+            projectId: currentProject.id,
             language: sourceLanguage
         })
     })
@@ -268,6 +813,12 @@ function startTranscription() {
         if (data.success) {
             currentSegments = data.transcription;
             translatedSegments = new Array(data.transcription.length);
+            
+            // Mettre à jour le projet actuel
+            if (data.project) {
+                currentProject = data.project;
+            }
+            
             setTimeout(() => {
                 transcriptionProgress.style.display = 'none';
                 transcriptionResult.style.display = 'block';
@@ -275,6 +826,9 @@ function startTranscription() {
                 displayTranscription(data.transcription);
                 switchTab('translate');
                 showNotification(`Transcription completed! ${data.transcription.length} segments detected`, 'success');
+                
+                // Recharger la liste des projets
+                loadProjects();
             }, 1000);
         } else {
             throw new Error(data.error);
@@ -288,15 +842,35 @@ function startTranscription() {
 }
 
 function displayTranscription(segments) {
+    console.log('🔄 Affichage de la transcription...');
+    console.log('📝 Nombre de segments:', segments.length);
+    console.log('📋 Segments:', segments);
+    
+    // Afficher la section de résultat de transcription
+    const transcriptionResult = document.getElementById('transcriptionResult');
+    if (transcriptionResult) {
+        transcriptionResult.style.display = 'block';
+        console.log('✅ Section transcriptionResult affichée');
+    }
+    
+    // Masquer la section de progression
+    const transcriptionProgress = document.getElementById('transcriptionProgress');
+    if (transcriptionProgress) {
+        transcriptionProgress.style.display = 'none';
+    }
+    
     const container = document.getElementById('transcriptionSegments');
     if (!container) {
-        console.error('transcriptionSegments container not found');
+        console.error('❌ Container transcriptionSegments non trouvé!');
         return;
     }
     
+    console.log('📦 Container transcription trouvé, vidage...');
     container.innerHTML = '';
 
+    console.log('🔄 Création des segments dans l\'interface...');
     segments.forEach((segment, index) => {
+        console.log(`📄 Création du segment ${index}:`, segment);
         const segmentDiv = document.createElement('div');
         segmentDiv.className = 'segment';
         segmentDiv.innerHTML = `
@@ -307,7 +881,16 @@ function displayTranscription(segments) {
             <div class="segment-text">${segment.text}</div>
         `;
         container.appendChild(segmentDiv);
+        console.log(`✅ Segment ${index} ajouté au container`);
     });
+    console.log('✅ Tous les segments ont été créés');
+    
+    // Mettre à jour le compteur de segments
+    const segmentCount = document.getElementById('segmentCount');
+    if (segmentCount) {
+        segmentCount.textContent = segments.length;
+        console.log('✅ Compteur de segments mis à jour:', segments.length);
+    }
 }
 
 
@@ -342,8 +925,8 @@ function showNotification(message, type = 'info') {
 
 
 function startTranslation() {
-    if (!currentSegments.length) {
-        alert('Please transcribe a video or upload an SRT file first.');
+    if (!currentProject || !currentSegments.length) {
+        alert('Please first create a project and perform transcription.');
         return;
     }
 
@@ -368,7 +951,7 @@ function startTranslation() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            segments: currentSegments,
+            projectId: currentProject.id,
             sourceLanguage: sourceLanguage,
             targetLanguage: targetLanguage
         })
@@ -403,11 +986,20 @@ function startTranslation() {
                                         if (data.segment) {
                                             const index = data.current - 1;
                                             translatedSegments[index] = data.segment;
-                                            updateTranslationDisplay();
+                                            // Mettre à jour seulement l'affichage des segments, pas le message de progression
+                                            updateTranslationSegmentsOnly();
                                         }
                                     } else if (data.type === 'complete') {
+                                        // Vérifier que tous les segments sont bien traduits
+                                        if (data.translatedSegments && data.translatedSegments.length === currentSegments.length) {
                                         translatedSegments = data.translatedSegments;
-                                        updateTranslationDisplay();
+                                            
+                                            // Mettre à jour l'affichage sans masquer la progression
+                                            updateTranslationDisplayWithoutHidingProgress();
+                                            
+                                            // Afficher le message de succès
+                                            progressText.textContent = 'Translation completed!';
+                                            progressBar.style.backgroundColor = '#27ae60';
                                         
                                         setTimeout(() => {
                                             translationProgress.style.display = 'none';
@@ -419,7 +1011,10 @@ function startTranslation() {
                                                 video.src = `/api/video/${encodeURIComponent(currentVideoPath)}`;
                                                 video.load();
                                             }
-                                        }, 1000);
+                                            }, 2000);
+                                        } else {
+                                            console.log('⚠️ Traduction incomplète, attente de tous les segments...');
+                                        }
                                     } else if (data.type === 'error') {
                                         throw new Error(data.error);
                                     }
@@ -445,10 +1040,69 @@ function startTranslation() {
 }
 
 function updateTranslationDisplay() {
+    console.log('🔄 Mise à jour de l\'affichage de traduction...');
+    console.log('📝 Nombre de segments traduits:', translatedSegments.length);
+    console.log('📋 Segments traduits:', translatedSegments);
+    
+    // Afficher la section de résultat de traduction
+    const translationResult = document.getElementById('translationResult');
+    if (translationResult) {
+        translationResult.style.display = 'block';
+        console.log('✅ Section translationResult affichée');
+    }
+    
+    // Masquer la section de progression
+    const translationProgress = document.getElementById('translationProgress');
+    if (translationProgress) {
+        translationProgress.style.display = 'none';
+    }
+    
+    updateTranslationSegments();
+}
+
+function updateTranslationDisplayWithoutHidingProgress() {
+    console.log('🔄 Mise à jour de l\'affichage de traduction (sans masquer la progression)...');
+    console.log('📝 Nombre de segments traduits:', translatedSegments.length);
+    console.log('📋 Segments traduits:', translatedSegments);
+    
+    // Afficher la section de résultat de traduction
+    const translationResult = document.getElementById('translationResult');
+    if (translationResult) {
+        translationResult.style.display = 'block';
+        console.log('✅ Section translationResult affichée');
+    }
+    
+    // NE PAS masquer la section de progression
+    updateTranslationSegments();
+}
+
+function updateTranslationSegments() {
+    updateTranslationSegmentsOnly();
+}
+
+function updateTranslationSegmentsOnly() {
+    // Afficher la section de résultat de traduction si elle n'est pas déjà visible
+    const translationResult = document.getElementById('translationResult');
+    if (translationResult && translationResult.style.display === 'none') {
+        translationResult.style.display = 'block';
+        console.log('✅ Section translationResult affichée');
+    }
+    
     const container = document.getElementById('translatedSegments');
+    if (!container) {
+        console.error('❌ Container translatedSegments non trouvé!');
+        return;
+    }
+    
+    console.log('📦 Container trouvé, vidage...');
     container.innerHTML = '';
 
     translatedSegments.forEach((segment, index) => {
+        console.log(`📄 Traitement du segment ${index}:`, segment);
+        if (!segment) {
+            console.log(`⚠️ Segment ${index} vide, ignoré`);
+            return; // Ignorer les segments vides
+        }
         if (!segment) return; // Ignorer les segments vides
         
         const segmentDiv = document.createElement('div');
@@ -485,6 +1139,12 @@ function updateTranslationDisplay() {
                 const segmentIndex = parseInt(textarea.getAttribute('data-index'));
                 if (translatedSegments[segmentIndex]) {
                     translatedSegments[segmentIndex].translatedText = textarea.value;
+                    
+                    // Afficher un indicateur de sauvegarde
+                    showSaveIndicator();
+                    
+                    // Sauvegarder automatiquement les modifications
+                    saveProjectChanges();
                 }
             });
         }
@@ -494,8 +1154,13 @@ function updateTranslationDisplay() {
 }
 
 function applySubtitles() {
-    if (!translatedSegments.length) {
-        alert('Please translate segments first.');
+    if (!currentProject) {
+        alert('Veuillez d\'abord créer un projet.');
+        return;
+    }
+    
+    if (!translatedSegments.length && !currentSegments.length) {
+        alert('Veuillez d\'abord effectuer la transcription et/ou la traduction.');
         return;
     }
 
@@ -518,8 +1183,7 @@ function applySubtitles() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            videoPath: currentVideoPath,
-            srtContent: srtContent,
+            projectId: currentProject.id,
             outputFilename: outputFilename
         })
     })

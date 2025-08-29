@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  seia-transcriptor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+    container_name: seia-transcriptor
+    ports:
+      - "3001:3001"
+    volumes:
+      # Persist project data
+      - ./projects:/app/projects
+      # Persist uploaded videos
+      - ./uploads:/app/uploads
+      # Persist generated outputs
+      - ./output:/app/output
+      # Persist subtitle files
+      - ./subtitles:/app/subtitles
+      # Environment variables
+      - ./.env:/app/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      # Node.js optimization
+      - UV_THREADPOOL_SIZE=16
+      - NODE_OPTIONS=--max-old-space-size=4096
+      # Whisper settings
+      - WHISPER_MODEL=base
+      - WHISPER_LANGUAGE=en
+      - WHISPER_NUM_THREADS=4
+      - WHISPER_BATCH_SIZE=16
+      # Ollama settings
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama2
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - seia-network
+
+  # Ollama service for local AI models
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - seia-network
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  seia-network:
+    driver: bridge

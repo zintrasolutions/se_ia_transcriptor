@@ -81,56 +81,140 @@ function sanitizeFilename(filename) {
 const uploadsDir = path.join(__dirname, 'uploads');
 const subtitlesDir = path.join(__dirname, 'subtitles');
 const outputDir = path.join(__dirname, 'output');
+const projectsDir = path.join(__dirname, 'projects'); // Nouveau dossier pour les projets
 
 // Créer les dossiers s'ils n'existent pas
 fs.ensureDirSync(uploadsDir);
 fs.ensureDirSync(subtitlesDir);
 fs.ensureDirSync(outputDir);
+fs.ensureDirSync(projectsDir); // Créer le dossier projets
 
-// Nettoyer les dossiers au démarrage
-console.log('🧹 Nettoyage des dossiers subtitles, output et uploads...');
+// Fichier de stockage des projets
+const projectsFile = path.join(projectsDir, 'projects.json');
+
+// Fonction pour charger les projets
+function loadProjects() {
+    try {
+        if (fs.existsSync(projectsFile)) {
+            const data = fs.readFileSync(projectsFile, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des projets:', error);
+    }
+    return [];
+}
+
+// Fonction pour sauvegarder les projets
+function saveProjects(projects) {
+    try {
+        fs.writeFileSync(projectsFile, JSON.stringify(projects, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde des projets:', error);
+        return false;
+    }
+}
+
+// Fonction pour créer un nouveau projet
+function createProject(videoFile, originalName) {
+    const projects = loadProjects();
+    const projectId = uuidv4();
+    const projectName = originalName.replace(/\.[^/.]+$/, ''); // Enlever l'extension
+    
+    const project = {
+        id: projectId,
+        name: projectName,
+        originalName: originalName,
+        videoPath: videoFile,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'uploaded', // uploaded, transcribing, transcribed, translating, translated, exported
+        sourceLanguage: 'en',
+        targetLanguage: 'fr',
+        segments: [],
+        translatedSegments: [],
+        subtitles: null,
+        exportedVideo: null
+    };
+    
+    projects.push(project);
+    saveProjects(projects);
+    
+    return project;
+}
+
+// Fonction pour mettre à jour un projet
+function updateProject(projectId, updates) {
+    const projects = loadProjects();
+    const projectIndex = projects.findIndex(p => p.id === projectId);
+    
+    if (projectIndex !== -1) {
+        projects[projectIndex] = { ...projects[projectIndex], ...updates, updatedAt: new Date().toISOString() };
+        saveProjects(projects);
+        return projects[projectIndex];
+    }
+    
+    return null;
+}
+
+// Fonction pour obtenir un projet par ID
+function getProject(projectId) {
+    const projects = loadProjects();
+    return projects.find(p => p.id === projectId);
+}
+
+// Fonction pour supprimer un projet
+function deleteProject(projectId) {
+    const projects = loadProjects();
+    const projectIndex = projects.findIndex(p => p.id === projectId);
+    
+    if (projectIndex !== -1) {
+        const project = projects[projectIndex];
+        
+        // Supprimer les fichiers associés
+        try {
+            if (project.videoPath && fs.existsSync(project.videoPath)) {
+                fs.unlinkSync(project.videoPath);
+            }
+            if (project.subtitles && fs.existsSync(project.subtitles)) {
+                fs.unlinkSync(project.subtitles);
+            }
+            if (project.exportedVideo && fs.existsSync(project.exportedVideo)) {
+                fs.unlinkSync(project.exportedVideo);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la suppression des fichiers du projet:', error);
+        }
+        
+        projects.splice(projectIndex, 1);
+        saveProjects(projects);
+        return true;
+    }
+    
+    return false;
+}
+
+// Vérifier et créer les dossiers nécessaires
+console.log('📁 Vérification des dossiers de travail...');
 try {
-  // Nettoyer le dossier uploads (garder seulement les vidéos récentes)
-  const uploadFiles = fs.readdirSync(uploadsDir);
-  uploadFiles.forEach(file => {
-    const filePath = path.join(uploadsDir, file);
-    const stats = fs.statSync(filePath);
-    const fileAge = Date.now() - stats.mtime.getTime();
-    const oneHour = 60 * 60 * 1000; // 1 heure en millisecondes
-    
-    // Supprimer les fichiers temporaires et les vidéos de plus d'1 heure
-    if (file.endsWith('.mp3') || file.endsWith('.json') || fileAge > oneHour) {
-      fs.removeSync(filePath);
-      console.log(`🗑️ Supprimé: ${file}`);
-    }
-  });
+  // Créer les dossiers s'ils n'existent pas
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('📁 Dossier uploads créé');
+  }
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+    console.log('📁 Dossier output créé');
+  }
+  if (!fs.existsSync(subtitlesDir)) {
+    fs.mkdirSync(subtitlesDir, { recursive: true });
+    console.log('📁 Dossier subtitles créé');
+  }
   
-  // Nettoyer le dossier output (garder seulement les vidéos avec sous-titres récentes)
-  const outputFiles = fs.readdirSync(outputDir);
-  outputFiles.forEach(file => {
-    const filePath = path.join(outputDir, file);
-    const stats = fs.statSync(filePath);
-    const fileAge = Date.now() - stats.mtime.getTime();
-    const twoHours = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
-    
-    // Supprimer les fichiers temporaires et les vidéos de plus de 2 heures
-    if (!file.includes('video_with_subtitles') || fileAge > twoHours) {
-      fs.removeSync(filePath);
-      console.log(`🗑️ Supprimé: ${file}`);
-    }
-  });
-  
-  // Nettoyer complètement le dossier subtitles
-  const subtitleFiles = fs.readdirSync(subtitlesDir);
-  subtitleFiles.forEach(file => {
-    const filePath = path.join(subtitlesDir, file);
-    fs.removeSync(filePath);
-    console.log(`🗑️ Supprimé: ${file}`);
-  });
-  
-  console.log('✅ Nettoyage terminé');
+  console.log('✅ Dossiers de travail prêts');
 } catch (error) {
-  console.log('⚠️ Erreur lors du nettoyage:', error.message);
+  console.log('⚠️ Erreur lors de la vérification des dossiers:', error.message);
 }
 
 // Configuration Multer pour l'upload de fichiers
@@ -164,6 +248,59 @@ const upload = multer({
 
 // Routes API
 
+// Routes pour la gestion des projets
+app.get('/api/projects', (req, res) => {
+    try {
+        const projects = loadProjects();
+        res.json(projects);
+    } catch (error) {
+        console.error('Erreur lors du chargement des projets:', error);
+        res.status(500).json({ error: 'Erreur lors du chargement des projets' });
+    }
+});
+
+app.get('/api/projects/:id', (req, res) => {
+    try {
+        const project = getProject(req.params.id);
+        if (project) {
+            res.json(project);
+        } else {
+            res.status(404).json({ error: 'Projet non trouvé' });
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement du projet:', error);
+        res.status(500).json({ error: 'Erreur lors du chargement du projet' });
+    }
+});
+
+app.put('/api/projects/:id', (req, res) => {
+    try {
+        const updatedProject = updateProject(req.params.id, req.body);
+        if (updatedProject) {
+            res.json(updatedProject);
+        } else {
+            res.status(404).json({ error: 'Projet non trouvé' });
+        }
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du projet:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du projet' });
+    }
+});
+
+app.delete('/api/projects/:id', (req, res) => {
+    try {
+        const success = deleteProject(req.params.id);
+        if (success) {
+            res.json({ message: 'Projet supprimé avec succès' });
+        } else {
+            res.status(404).json({ error: 'Projet non trouvé' });
+        }
+    } catch (error) {
+        console.error('Erreur lors de la suppression du projet:', error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
+    }
+});
+
 // Upload de vidéo
 app.post('/api/upload', upload.single('video'), async (req, res) => {
   try {
@@ -172,13 +309,14 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
     }
 
     const videoPath = req.file.path;
-    const videoId = path.basename(req.file.filename, path.extname(req.file.filename));
+    const originalName = req.file.originalname;
+    
+    // Créer un nouveau projet
+    const project = createProject(videoPath, originalName);
     
     res.json({
       success: true,
-      videoId: videoId,
-      filename: req.file.originalname,
-      path: videoPath
+      project: project
     });
   } catch (error) {
     console.error('Erreur upload:', error);
@@ -189,8 +327,18 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
 // Transcription de la vidéo
 app.post('/api/transcribe', async (req, res) => {
   try {
-    const { videoPath, language } = req.body;
+    const { projectId, language } = req.body;
     
+    if (!projectId) {
+      return res.status(400).json({ error: 'ID du projet requis' });
+    }
+    
+    const project = getProject(projectId);
+    if (!project) {
+      return res.status(404).json({ error: 'Projet non trouvé' });
+    }
+    
+    const videoPath = project.videoPath;
     if (!videoPath || !fs.existsSync(videoPath)) {
       return res.status(400).json({ error: 'Fichier vidéo introuvable' });
     }
@@ -236,6 +384,9 @@ app.post('/api/transcribe', async (req, res) => {
     await new Promise((resolve, reject) => {
       ffmpeg(videoPath)
         .toFormat('mp3')
+        .audioChannels(1)
+        .audioFrequency(16000)
+        .outputOptions(['-threads', '4'])
         .on('end', resolve)
         .on('error', reject)
         .save(audioPath);
@@ -286,8 +437,12 @@ app.post('/api/transcribe', async (req, res) => {
       
       console.log('🔍 PATH système pour Whisper:', env.PATH);
       
-      // Commande Whisper avec timestamps et précision FP32 (désactive FP16)
-      const whisperCommand = `whisper "${audioPath}" --model ${WHISPER_MODEL} --language ${WHISPER_LANGUAGE} --fp16 False --output_format json --output_dir "${uploadsDir}"`;
+      // Configuration du multithreading pour Whisper
+      const numThreads = process.env.WHISPER_NUM_THREADS || '4';
+      const batchSize = process.env.WHISPER_BATCH_SIZE || '16';
+      
+      // Commande Whisper avec multithreading, timestamps et précision FP32
+      const whisperCommand = `whisper "${audioPath}" --model ${WHISPER_MODEL} --language ${language || WHISPER_LANGUAGE} --fp16 False --output_format json --output_dir "${uploadsDir}" --num_threads ${numThreads} --batch_size ${batchSize}`;
       
       console.log('Exécution de la commande Whisper:', whisperCommand);
       
@@ -346,6 +501,14 @@ app.post('/api/transcribe', async (req, res) => {
       }
     }
 
+    // Mettre à jour le projet avec les segments transcrits
+    updateProject(projectId, {
+      status: 'transcribed',
+      sourceLanguage: language || 'en',
+      segments: segments,
+      subtitles: path.join(subtitlesDir, `${path.basename(videoPath, path.extname(videoPath))}.srt`)
+    });
+
     // Convertir en format SRT
     const srtContent = convertToSRT(segments);
     const srtPath = path.join(subtitlesDir, `${path.basename(videoPath, path.extname(videoPath))}.srt`);
@@ -358,7 +521,8 @@ app.post('/api/transcribe', async (req, res) => {
       success: true,
       transcription: segments,
       srtPath: srtPath,
-      srtContent: srtContent
+      srtContent: srtContent,
+      project: getProject(projectId)
     });
 
   } catch (error) {
@@ -370,10 +534,20 @@ app.post('/api/transcribe', async (req, res) => {
 // Traduction via Ollama
 app.post('/api/translate', async (req, res) => {
   try {
-    const { segments, targetLanguage, sourceLanguage } = req.body;
+    const { projectId, targetLanguage, sourceLanguage } = req.body;
     
-    if (!segments || !targetLanguage) {
-      return res.status(400).json({ error: 'Segments and target language required' });
+    if (!projectId || !targetLanguage) {
+      return res.status(400).json({ error: 'ID du projet et langue cible requis' });
+    }
+    
+    const project = getProject(projectId);
+    if (!project) {
+      return res.status(404).json({ error: 'Projet non trouvé' });
+    }
+    
+    const segments = project.segments;
+    if (!segments || segments.length === 0) {
+      return res.status(400).json({ error: 'Aucun segment à traduire. Effectuez d\'abord la transcription.' });
     }
 
     // Configurer les headers pour Server-Sent Events
@@ -437,11 +611,19 @@ app.post('/api/translate', async (req, res) => {
       }
     }
 
+    // Mettre à jour le projet avec les segments traduits
+    updateProject(projectId, {
+      status: 'translated',
+      targetLanguage: targetLanguage,
+      translatedSegments: translatedSegments
+    });
+
     // Envoyer la réponse finale
     res.write(`data: ${JSON.stringify({
       type: 'complete',
       success: true,
-      translatedSegments: translatedSegments
+      translatedSegments: translatedSegments,
+      project: getProject(projectId)
     })}\n\n`);
     
     res.end();
@@ -484,11 +666,32 @@ app.post('/api/save-subtitles', async (req, res) => {
 // Appliquer les sous-titres à la vidéo
 app.post('/api/apply-subtitles', async (req, res) => {
   try {
-    const { videoPath, srtContent, outputFilename } = req.body;
+    const { projectId, outputFilename } = req.body;
     
-    if (!videoPath || !srtContent || !outputFilename) {
-      return res.status(400).json({ error: 'Video path, subtitle content and output filename required' });
+    if (!projectId || !outputFilename) {
+      return res.status(400).json({ error: 'ID du projet et nom de fichier de sortie requis' });
     }
+    
+    const project = getProject(projectId);
+    if (!project) {
+      return res.status(404).json({ error: 'Projet non trouvé' });
+    }
+    
+    const videoPath = project.videoPath;
+    const segments = project.translatedSegments && project.translatedSegments.length > 0 
+      ? project.translatedSegments 
+      : project.segments;
+    
+    if (!videoPath || !fs.existsSync(videoPath)) {
+      return res.status(400).json({ error: 'Fichier vidéo introuvable' });
+    }
+    
+    if (!segments || segments.length === 0) {
+      return res.status(400).json({ error: 'Aucun segment disponible. Effectuez d\'abord la transcription.' });
+    }
+    
+    // Générer le contenu SRT à partir des segments
+    const srtContent = convertToSRT(segments, project.translatedSegments && project.translatedSegments.length > 0);
 
     let sanitizedFilename = sanitizeFilename(outputFilename);
     
@@ -572,11 +775,18 @@ app.post('/api/apply-subtitles', async (req, res) => {
       ffmpegCommand.save(outputPath);
     });
 
+    // Mettre à jour le projet avec la vidéo exportée
+    updateProject(projectId, {
+      status: 'exported',
+      exportedVideo: outputPath
+    });
+
     res.json({
       success: true,
       outputPath: outputPath,
       outputFilename: sanitizedFilename,
-      message: 'Video with subtitles created successfully'
+      message: 'Video with subtitles created successfully',
+      project: getProject(projectId)
     });
 
   } catch (error) {
